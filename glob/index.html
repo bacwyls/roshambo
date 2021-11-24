@@ -1,0 +1,125 @@
+<!doctype html>
+
+<html>
+<head>
+  <title>%roshambo</title>
+
+  <style>
+    body {
+      margin:auto;
+      text-align:center;
+      font-size:1.5vmax;
+    }
+    form#rshb-play-form {
+      background-color:#ddd;
+      padding:10px;
+      border-radius:20px;
+    }
+
+    input[type="submit" i] {
+      border-radius:10px;
+      padding:5px;
+      font-size:1.5vmax;
+    }
+
+    input[type="radio" i] {
+      border:0px;
+      width:10%;
+      height:2em;
+    }
+
+    div#rshb-winner-block {
+      padding:1em;
+      /*background-color:#0f0;*/
+      /*background-color:#f00;
+        color:white;*/
+      /*background-color:#fff;*/
+    }
+
+    div#rshb-play-block {
+      width:20em;
+      margin:auto;
+    }
+
+    form#rshb-play-form {
+      text-align:left;
+    }
+
+  </style>
+
+  <script src="script.js"></script>
+
+</head>
+
+<body>
+
+<h1>%roshambo</h1>
+<p style="font-family:monospace">:: [] >%</p>
+<img src="img/plungerfish.jpg" width="50px" style="border-radius:10px;">
+<br>
+<hr>
+
+<div id="rshb-no-game">
+  <p>select your opponent.</p>
+
+  <form id="rshb-start-form">
+  <input id="rshb-opponent" type="text">
+  <input type="button" value="OK" onclick="play()">
+  </form>
+
+  <div id="rshb-start-wait" style="display:none;">
+    <p>waiting...</p>
+  </div>
+  <hr>
+</div>
+
+
+<div id="rshb-game" style="display:none;">
+  <p> your opponent is:
+      <strong>
+      <span id="rshb-opponent-patp"> ~zod </span>
+      </strong> </p>
+
+  <form id="rshb-leave-form">
+  <input type="button" value="EXIT" onclick="exit()">
+  </form>
+  
+  <br>
+  <hr>
+
+  <p>
+      <strong>
+      <span id="rshb-them-patp"> them </span>:
+      </strong>
+    <span id="rshb-them-play"> ~ </span>
+  <br>
+
+  <p>
+      <strong>
+      <span id="rshb-you-patp"> you </span>:
+      </strong>
+    <span id="rshb-you-play"> ~ </span>
+  </p>
+
+  <div id="rshb-winner-block">
+    <span id="rshb-winner-msg">...</span>
+  </div>
+
+  <hr>
+
+  <div id="rshb-play-block">
+    <form id="rshb-play-form">
+      <input type="radio" id="rock" value="rock" name="rshb">
+        <label for="rock">%rock</label><br>
+      <input type="radio" id="paper" value="paper" name="rshb">
+        <label for="paper">%paper</label><br>
+      <input type="radio" id="scissors" value="scissors" name="rshb">
+        <label for="scissors">%scissors</label><br><br>
+
+      <input type="button" onclick="shoot()" value="SHOOT">
+    </form>
+  </div>
+
+</div>
+</body>
+</html>

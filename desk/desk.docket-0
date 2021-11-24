@@ -1,0 +1,11 @@
+:~  title+'roshambo'
+    info+'simple rock paper scissors game'
+    color+0xff00
+    image+'http://clipart-library.com/images/kiKnorjRT.png'
+    base+'roshambo'
+    glob-ames+[~bus 0v0]
+    version+[0 0 1]
+    website+'http://example.com'
+    license+'MIT'
+==
+
