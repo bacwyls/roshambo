@@ -47,7 +47,12 @@
 
   </style>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <!--
   <script src="script.js"></script>
+  -->
+  <script src="bundle.js"></script>
 
 </head>
 
@@ -64,7 +69,7 @@
 
   <form id="rshb-start-form">
   <input id="rshb-opponent" type="text">
-  <input type="button" value="OK" onclick="play()">
+  <input id="rshb-start-button" type="button" value="OK">
   </form>
 
   <div id="rshb-start-wait" style="display:none;">
@@ -81,7 +86,7 @@
       </strong> </p>
 
   <form id="rshb-leave-form">
-  <input type="button" value="EXIT" onclick="exit()">
+  <input id="rshb-leave-button" type="button" value="EXIT">
   </form>
   
   <br>
@@ -116,7 +121,7 @@
       <input type="radio" id="scissors" value="scissors" name="rshb">
         <label for="scissors">%scissors</label><br><br>
 
-      <input type="button" onclick="shoot()" value="SHOOT">
+      <input id="rshb-shoot-button" type="button" value="SHOOT">
     </form>
   </div>
 

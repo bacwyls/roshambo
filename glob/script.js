@@ -1,3 +1,9 @@
+$(document).ready ( function(){
+
+var httpapi = require("@urbit/http-api");
+
+var urb = new httpapi.Urbit('', '');
+
 function shoot() {
 
   var choices = document.getElementsByName('rshb');
@@ -11,13 +17,24 @@ function shoot() {
     }
   }
   
-  if(!chosen) console.log("nothing is chosen");
+  if(!chosen) {
+    console.log("nothing is chosen");
+  }
+  else {
+    console.log("poking:");
+    urb.poke({ app:'roshambo', mark:'roshambo-shoot', json:'test'});
+  }
 }
+button = document.getElementById('rshb-shoot-button'); 
+button.addEventListener('click', shoot);
+
 
 function exit() {
   console.log("exit game");
   set_ui_state(0);
 }
+button = document.getElementById('rshb-leave-button'); 
+button.addEventListener('click', exit);
 
 function play() {
   var them = document.getElementById('rshb-opponent');
@@ -25,6 +42,9 @@ function play() {
   console.log(them.value);
   set_ui_state(2);
 }
+button = document.getElementById('rshb-start-button'); 
+button.addEventListener('click', play);
+
 
 function set_ui_state(state) {
   var nogame = document.getElementById('rshb-no-game');
@@ -80,4 +100,6 @@ function set_you_play(play) {
 function set_them_play(play) {
   document.getElementById('rshb-them-play').textContent = play;
 }
+
+});
 
