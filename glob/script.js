@@ -1,8 +1,10 @@
 $(document).ready ( function(){
 
-var httpapi = require("@urbit/http-api");
+var uhapi = require("@urbit/http-api");
 
-var urb = new httpapi.Urbit('', '');
+var urb = new uhapi.Urbit('', '', 'roshambo');
+urb.ship = window.ship;
+urb.verbose = true;
 
 function shoot() {
 
@@ -22,7 +24,7 @@ function shoot() {
   }
   else {
     console.log("poking:");
-    urb.poke({ app:'roshambo', mark:'roshambo-shoot', json:'test'});
+    urb.poke({ app:'roshambo', mark:'roshambo-action', json:'pancake'});
   }
 }
 button = document.getElementById('rshb-shoot-button'); 
