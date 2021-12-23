@@ -2,6 +2,34 @@
 
 by ~bacwyl-samweg
 
+p2p protocol for rock paper scissors
+
+~bus sends a %poise to ~run with a time-window when ~bus plans to %shoot.
+if ~run is up for it, ~run will return a %poise with the same time-window.
+otherwise, ~run will return a %chill.
+
+when the time comes, ~run and ~bus will %shoot
+
+only one %shoot is accepted in the window and %shoot is ignored outside the window.
+
+.
+
+~run and ~bus send one another a %poise (timestamped)
+they use the nearest shoot-time
+
+our %poise
+  set poise in state and
+  send to their
+their %poise
+  
+
+.
+
+a behn timer will fire at shoot-time and send a %shoot
+  it will use a ?[%r %p %s] value from the agent state
+  which can be set by self %shoot pokes
+
+
 
 ------
 
@@ -16,8 +44,6 @@ create a fake galaxy
 then in ~bus do:
 
 ```
-|mount %base
-
 |merge %roshambo our %base
 
 |mount %roshambo
@@ -54,13 +80,4 @@ should be installed now. go to localhost in web browser and click on roshambo ti
 known issues:
 
 it doesnt work at all.
-
-Failed to load resource: the server responded with a status of 400 (missing)
-bundle.js:652 Uncaught (in promise) Error: Failed to PUT channel
-    at Urbit.sendJSONtoChannel (bundle.js:652)
-    at async Promise.all (/apps/roshambo/index 0)
-    at async Urbit.poke (bundle.js:717)
-
-need to set up proper mar/roshambo-action to get pokes working before i can really test the http-api urb.poke
-
 

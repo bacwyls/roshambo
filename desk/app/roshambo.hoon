@@ -7,8 +7,12 @@
   ==
 +$  state-0  $:
   %0
-  game=(unit game)
-  chlgs=(list chlg)
+  poise=(unit poise)
+  ifist=(unit shoot)
+  ufist=(unit shoot)
+  delay=@dr
+  flexi=@dr
+  verbs=?
   ==
 +$  card     card:agent:gall
 --
@@ -22,95 +26,41 @@
     def   ~(. (default-agent this %|) bowl)
     hc    ~(. +> bowl)
 ::
-++  on-init   [~ this]
-++  on-save   !>(~)
-++  on-load   on-load:def
-++  on-arvo   on-arvo:def
+++  on-init
+  =.  state  init-state
+  [~ this]
+++  on-save
+  =.  state  init-state
+  !>(~)
+++  on-load
+  |=  =vase
+  =.  state  init-state
+  `this
 ++  on-peek   on-peek:def
 ++  on-fail   on-fail:def
-++  on-watch
-  |=  =path
+++  on-watch  on-watch:def
+++  on-leave  on-leave:def
+++  on-agent  on-agent:def
+++  on-arvo
+  ^+  on-arvo:*agent:gall
+  |=  [=wire =sign-arvo]
   ^-  (quip card _this)
-  ~&  >>>  "on-watch"
-  ~&  >>>  path
-  :: every sub is a challenger
-  ?+    path  (on-watch:def path)
-    [%game ~]
-      ?:  |-
-          ?~  chlgs  |
-          ?:  =(ee.i.chlgs src.bowl)  &
-          $(chlgs t.chlgs)
-        ~&  >  "accepted!"
-        =.  game.state  (make-game src.bowl now.bowl)
-        =.  chlgs.state  ~
-        ?~  game.state  !!
-        `this
-        :: :_  this
-        :: :~  [%give %fact ~[/game] %roshambo-action !>([%share u.game.state])]
-        :: ==
-      =|  =chlg
-      =.  er.chlg   src.bowl
-      =.  ee.chlg   our.bowl
-      =.  wen.chlg  now.bowl
-      =.  chlgs.state
-        (snoc chlgs.state chlg)
-      `this
-  ==
-::
-++  on-agent 
-  |=  [=wire =sign:agent:gall]
-  ^-  (quip card _this)
-  ~&  >>>  "on-agent"
-  ~&  >>>  [wire sign]
-  ?+    wire  (on-agent:def wire sign)
-      [%play ~]
-    ?+    -.sign  (on-agent:def wire sign)
-        %kick
-      ~&  >  "kick"
-      ~&  >  state
-      =.  state  *state-0
-      :: TODO reset state to bunt
-      `this
-    ::
-        %fact
-      ~&  >  "fact"
-      =|  =action
-      =.  action  !<(^action q.cage.sign)
-      ~&  >  action
-      :: ?+    p.cage.sign  (on-agent:def wire sign)
-      ::     %roshambo-action
-          `this
-    ::
-        %watch-ack
-      ?~  p.sign
-        ((slog '%roshambo: Subscribe succeeded!' ~) `this)
-      ((slog '%roshambo: Subscribe failed!' ~) `this)
-    ::
-    ==
-  ==
-++  on-leave
-  |=  =path
-  ~&  >>>  "on-leave"
-  ~&  >>>  path
-  `this
+  ?~  poise.state  `this
+  ?~  ifist.state  `this
+  :_  this
+    :~  shoot-card
+    ==  
 ++  on-poke
   |=  [=mark =vase]
   ^-  (quip card _this)
-  ~&  >>>  "on-poke"
-  ~&  >>>  [mark vase]
-  ?.  =(src.bowl our.bowl)
-    `this
   ?+  mark  (on-poke:def mark vase)
       %noun
     ?+    q.vase  (on-poke:def mark vase)
       %print-state
-    ~&  >>  "got print-state"
     ~&  >>  state
-    ~&  >>>  bowl  `this
+    `this
     ==
       %roshambo-action
-    ~&  >>>  vase
-    ~&  >>>  !<(action vase)
     =^  cards  state
     (handle-action:hc !<(action vase))
     [cards this]
@@ -119,76 +69,164 @@
 ::
 :: helper core
 |_  bowl=bowl:gall
+++  init-state
+  :*  %0
+    ~  ~  ~  ~s20  ~s2  &
+  ==
+++  bwait
+  |=  da=@da
+  ^-  card
+  ?~  poise.state  !!
+  [%pass /wait/(scot %da da) %arvo %b %wait da]
+++  brest
+  |=  da=@da
+  ^-  card
+  :: ?~  poise.state  !!
+  [%pass /wait/(scot %da da) %arvo %b %rest da]
+++  bwait-proxy
+  |=  da=@da
+  ^-  card
+  :*  %pass   /poke-wire   %agent
+    [our.bowl %roshambo]
+    %poke  %roshambo-action
+    !>(`action`[%set %wait da])
+  ==
+++  brest-proxy
+  |=  da=@da
+  ^-  card
+  :*  %pass   /poke-wire   %agent
+    [our.bowl %roshambo]
+    %poke  %roshambo-action
+    !>(`action`[%set %rest da])
+  ==
+++  chill-card
+  |=  who=@p
+  :*  %pass   /poke-wire   %agent
+    [who %roshambo]
+    %poke  %roshambo-action
+    !>(`action`[%chill ~])
+  ==
+++  poise-card
+  =*  poise
+    ?~  poise.state  !!
+    u.poise.state
+  :*  %pass   /poke-wire   %agent
+    [who.poise %roshambo]
+    %poke  %roshambo-action
+    !>(`action`%poise^poise)
+  ==
+++  shoot-card
+  =*  poise
+    ?~  poise.state  !!
+    u.poise.state
+  =*  shoot
+    ?~  ifist.state  !!
+    u.ifist.state
+  :*  %pass   /poke-wire   %agent
+    [who.poise %roshambo]
+    %poke  %roshambo-action
+    !>(`action`%shoot^shoot)
+  ==
 ++  handle-action
   |=  =action
   ^-  (quip card _state)
-  ~&  >  state
-  ~&  >  "got poke"
-  ~&  >  action
   ?-  -.action
+  %poise
+    :: agents will settle on the later time
+    ?~  poise.state
+      `state
+    ?:  (gth now.bowl wen.u.poise.state)
+      `state
+    =/  ipoi=^poise
+      u.poise.state
+    =/  upoi=^poise
+      +.action
+    ?.  =(src.bowl who.ipoi)  !!
+    ?:  (gth wen.upoi wen.ipoi)
+      =/  oldwen=@da  wen.ipoi
+      =.  wen.ipoi  wen.upoi
+      =.  viv.ipoi  viv.upoi
+      =.  u.poise.state  ipoi
+      :: reset behn
+      :_  state
+      :~
+        (brest-proxy oldwen)
+        (bwait-proxy wen.ipoi)
+      ==
+    :: send my poise again
+    :_  state
+      [poise-card ~]
   %shoot
-    ?.  =(src.bowl our.bowl)  !!
-    ?~  +.action    !!
-    ?~  game.state  !!
-    =.  mine.u.game.state  +.action
-    :_  state
-    :~
-      [%give %fact ~[/game] %roshambo-action !>(`^action`%share^%hand^u.game.state)]
-    ==
-  %exit
-    ?.  =(src.bowl our.bowl)  !!
-    ?~  game.state  !!
-    =/  who=@p  enme.u.game.state
-    :_  state(game ~)
-    ::  ?~  game.state  !!
-    :~  [%pass /play %agent [who %roshambo] %leave ~]
-      ==
-  %chlng 
-    ?.  =(src.bowl our.bowl)  !!
-    ?:  |-
-        ?~  chlgs  |
-        ?:  =(ee.i.chlgs +.action)  &
-        $(chlgs t.chlgs)
-      ~&  >  "already challenged"
+    ?~  poise.state  `state
+    =*  poise
+      u.poise.state
+    ?:  =(src.bowl who.poise)
+      :: assert now in poise time window
+      ?.  &((gte now.bowl wen.poise) (lte now.bowl (add wen.poise viv.poise)))
+        ~&  >>>  "bad timing"
+        ~&  >>>  now.bowl
+        !!
+      :: TODO
+      :: declare win, draw, or fail
+      =.  ufist.state  [~ +.action]
+      ~&  >  "GAME"
+      ~&  >  [ifist ufist]
       `state
-    =|  =chlg
-    =.  wen.chlg  now.bowl
-    =.  er.chlg   our.bowl
-    =.  ee.chlg   +.action
-    =.  chlgs.state
-        (snoc chlgs.state chlg)
-    :_  state
-    :~  [%pass /play %agent [+.action %roshambo] %watch /game]
-      ==
-  %accpt
-    ?.  |-
-        ?~  chlgs  |
-        ?:  =(er.i.chlgs +.action)  &
-        $(chlgs t.chlgs)
-      ~&  >  "not challenged"
+    !!
+  %chill
+    :: TODO does nothing
+    `state
+  %set
+    ?.  =(src.bowl our.bowl)  `state
+    ?-  +<.action
+    %shoot
+      =.  ifist.state  [~ +>.action]
       `state
-    =.  game.state  (make-game +.action now.bowl)
-    ?~  game.state  !!
-    =.  chlgs.state  ~
-    :_  state
-    :~  [%pass /play %agent [+.action %roshambo] %watch /game]
-        [%give %fact ~[/game] %roshambo-action !>(`^action`%share^%init^u.game.state)]
+    %verbs
+      =.  verbs.state  +>.action
+      `state
+    %delay
+      =.  delay.state  +>.action
+      `state
+    %flexi
+      =.  delay.state  +>.action
+      `state
+    %rest
+      :_  state
+        [(brest +>.action) ~]
+    %wait
+      ~&  >  +>.action
+      :_  state
+        [(bwait +>.action) ~]
+    %poise
+      =/  oldwen=@da
+        :: bunt if no poise or expired poise
+        ?~  poise.state 
+          *@da
+        ?:  (gte now.bowl (add wen.u.poise.state viv.u.poise.state))
+          *@da
+        wen.u.poise.state
+      =/  wen=@da  (add now.bowl delay.state)
+      =.  poise.state
+        :*  ~
+          who.+>.action 
+          wen
+          flexi.state
+        ==
+      :_  state
+        :: TODO add behn call
+        ?:  =(oldwen *@da)  
+          :~
+            poise-card
+            (bwait-proxy wen)
+          ==
+        :~
+          poise-card
+          (brest-proxy oldwen)
+          (bwait-proxy wen)
+        ==
+
     ==
-  %again  `state
-  %share  `state
-  ::      [%pass /poke-wire %agent [~bus %roshambo] %poke %roshambo-action !>(action)]
   ==
-++  make-game
-  |=  [enme=@p born=@da]
-  :: ^-  game
-  ~&  >>>  "make game: born"
-  ~&  >>>  born
-  :-  ~
-  :*  enme
-      [born `@da`(add born ~m2)]
-      [0 0]
-      ~
-      ~
-    ==
 --
 
