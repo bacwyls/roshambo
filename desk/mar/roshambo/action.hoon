@@ -3,7 +3,7 @@
 |_  act=action:roshambo
 ++  grab
   |%  
-  ++  noun  act
+  ++  noun  action:roshambo
   ++  json
     |=  jon=^json
     ~&  >>  jon
