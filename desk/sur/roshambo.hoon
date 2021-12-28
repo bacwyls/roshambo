@@ -2,26 +2,37 @@
 +$  shoot  ?(%r %p %s)
 +$  poise
   $:
-    who=@p
-    wen=@da
-    viv=@dr
+    opponent=@p
+    shoot-time=@da
+    latency=@dr
+  ==
++$  game
+  $:
+  poise=(unit poise)
+  shoot-self=(unit shoot)
+  shoot-opponent=(unit shoot)
   ==
 +$  set
   $%
-  [%verbs ?]
   [%rest @da]
   [%wait @da]
-  [%delay @dr]
-  [%flexi @dr]
-  [%poise poise]
+  [%verbose ?]
+  [%latency @dr]
+  [%poise @p]
   [%shoot shoot]
+  [%poise-delay @dr]
+  ==
++$  client-action
+  $%
+  [%poise @p]
+  [%shoot @]
   ==
 +$  action
   $%
-  [%chill ~]
+  [%set set]
+  [%reset ~]
   [%poise poise]
   [%shoot shoot]
-  [%set set]
   ==
 --
 

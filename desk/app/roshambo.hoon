@@ -8,11 +8,11 @@
 +$  state-0  $:
   %0
   poise=(unit poise)
-  ifist=(unit shoot)
-  ufist=(unit shoot)
-  delay=@dr
-  flexi=@dr
-  verbs=?
+  shoot-self=(unit shoot)
+  shoot-opponent=(unit shoot)
+  poise-delay=@dr
+  latency=@dr
+  verbose=?
   ==
 +$  card     card:agent:gall
 --
@@ -26,6 +26,10 @@
     def   ~(. (default-agent this %|) bowl)
     hc    ~(. +> bowl)
 ::
+++  on-fail   on-fail:def
+++  on-leave  on-leave:def
+++  on-agent  on-agent:def
+++  on-peek  on-peek:def
 ++  on-init
   =.  state  init-state
   [~ this]
@@ -36,17 +40,28 @@
   |=  =vase
   =.  state  init-state
   `this
-++  on-peek   on-peek:def
-++  on-fail   on-fail:def
-++  on-watch  on-watch:def
-++  on-leave  on-leave:def
-++  on-agent  on-agent:def
+++  on-watch
+|=  =path
+  ^-  (quip card _this)
+  ?.  =(src.bowl our.bowl)  `this
+  ?+    path  (on-watch:def path)
+    [%game-updates ~]
+      ?~  poise.state
+        `this
+      :_  this
+        :~
+          game-update-card
+        ==
+  ==
 ++  on-arvo
   ^+  on-arvo:*agent:gall
   |=  [=wire =sign-arvo]
   ^-  (quip card _this)
   ?~  poise.state  `this
-  ?~  ifist.state  `this
+  ?~  shoot-self.state  `this
+  ?.  =(our.bowl src.bowl)  `this
+  ?.  (is-poise-active u.poise.state now.bowl)
+    `this
   :_  this
     :~  shoot-card
     ==  
@@ -64,6 +79,22 @@
     =^  cards  state
     (handle-action:hc !<(action vase))
     [cards this]
+      %roshambo-ui-shoot
+    ?.  =(our.bowl src.bowl)  `this
+    =/  =shoot
+      (cord-to-shoot (cord +.q.vase))
+    :_  this
+      :~  (set-shoot-card our.bowl shoot)
+      ==
+    ::
+      %roshambo-ui-poise
+    ?.  =(our.bowl src.bowl)  `this
+    =/  who=@p
+      ^-  @p
+      (slav %p (cord +.q.vase))
+    :_  this
+      :~  (set-poise-card our.bowl who)
+      ==
   ==
 --
 ::
@@ -71,8 +102,25 @@
 |_  bowl=bowl:gall
 ++  init-state
   :*  %0
-    ~  ~  ~  ~s20  ~s2  &
+    ~  ~  ~  ~s10  ~s2  &
   ==
+++  cord-to-shoot
+  |=  shot=cord
+  ?:  =(shot 'r')
+    %r
+  ?:  =(shot 'p')
+    %p
+  ?:  =(shot 's')
+    %s
+  !!
+++  game-update-card
+  =<
+  =/  =game  make-game
+  [%give %fact ~[/game-updates] [%roshambo-update !>(`^game`game)]]
+  |%
+  ++  make-game
+    [poise.state shoot-self.state shoot-opponent.state]
+  --
 ++  bwait
   |=  da=@da
   ^-  card
@@ -99,59 +147,78 @@
     %poke  %roshambo-action
     !>(`action`[%set %rest da])
   ==
-++  chill-card
-  |=  who=@p
-  :*  %pass   /poke-wire   %agent
-    [who %roshambo]
-    %poke  %roshambo-action
-    !>(`action`[%chill ~])
-  ==
 ++  poise-card
   =*  poise
     ?~  poise.state  !!
     u.poise.state
   :*  %pass   /poke-wire   %agent
-    [who.poise %roshambo]
+    [opponent.poise %roshambo]
     %poke  %roshambo-action
     !>(`action`%poise^poise)
+  ==
+++  set-poise-card
+  |=  [our=@p who=@p]
+  :*  %pass   /poke-wire   %agent
+    [our %roshambo]
+    %poke  %roshambo-action
+    !>(`action`%set^%poise^who)
+  ==
+++  set-shoot-card
+  |=  [our=@p =shoot]
+  :*  %pass   /poke-wire   %agent
+    [our %roshambo]
+    %poke  %roshambo-action
+    !>(`action`%set^%shoot^shoot)
   ==
 ++  shoot-card
   =*  poise
     ?~  poise.state  !!
     u.poise.state
   =*  shoot
-    ?~  ifist.state  !!
-    u.ifist.state
+    ?~  shoot-self.state  !!
+    u.shoot-self.state
   :*  %pass   /poke-wire   %agent
-    [who.poise %roshambo]
+    [opponent.poise %roshambo]
     %poke  %roshambo-action
     !>(`action`%shoot^shoot)
+  ==
+++  is-poise-active
+  |=  [=^poise now=@da]
+  ?&  (gte now shoot-time.poise)
+    (lte now (add shoot-time.poise latency.poise))
   ==
 ++  handle-action
   |=  =action
   ^-  (quip card _state)
   ?-  -.action
+  %reset
+    ?.  =(our.bowl src.bowl)
+      `state
+    =.  poise.state  ~
+    =.  shoot-self.state  ~
+    =.  shoot-opponent.state  ~
+    `state
   %poise
     :: agents will settle on the later time
     ?~  poise.state
       `state
-    ?:  (gth now.bowl wen.u.poise.state)
+    ?:  (gth now.bowl shoot-time.u.poise.state)
       `state
     =/  ipoi=^poise
       u.poise.state
     =/  upoi=^poise
       +.action
-    ?.  =(src.bowl who.ipoi)  !!
-    ?:  (gth wen.upoi wen.ipoi)
-      =/  oldwen=@da  wen.ipoi
-      =.  wen.ipoi  wen.upoi
-      =.  viv.ipoi  viv.upoi
+    ?.  =(src.bowl opponent.ipoi)  !!
+    ?:  (gth shoot-time.upoi shoot-time.ipoi)
+      =/  old-shoot-time=@da  shoot-time.ipoi
+      =.  shoot-time.ipoi  shoot-time.upoi
+      =.  latency.ipoi  latency.upoi
       =.  u.poise.state  ipoi
       :: reset behn
       :_  state
       :~
-        (brest-proxy oldwen)
-        (bwait-proxy wen.ipoi)
+        (brest-proxy old-shoot-time)
+        (bwait-proxy shoot-time.ipoi)
       ==
     :: send my poise again
     :_  state
@@ -160,72 +227,79 @@
     ?~  poise.state  `state
     =*  poise
       u.poise.state
-    ?:  =(src.bowl who.poise)
-      :: assert now in poise time window
-      ?.  &((gte now.bowl wen.poise) (lte now.bowl (add wen.poise viv.poise)))
-        ~&  >>>  "bad timing"
-        ~&  >>>  now.bowl
-        !!
-      :: TODO
-      :: declare win, draw, or fail
-      =.  ufist.state  [~ +.action]
-      ~&  >  "GAME"
-      ~&  >  [ifist ufist]
+    ?.  =(src.bowl opponent.poise)
       `state
-    !!
-  %chill
-    :: TODO does nothing
-    `state
+    :: assert now in poise time window
+    ?.  (is-poise-active poise now.bowl)
+      `state
+    :: TODO
+    :: declare win, draw, or fail
+    =.  shoot-opponent.state  [~ +.action]
+    ~&  >  "GAME"
+    ~&  >  [shoot-self.state shoot-opponent.state]
+    :_  state
+    ~[game-update-card]
   %set
-    ?.  =(src.bowl our.bowl)  `state
+    ?.  =(src.bowl our.bowl)
+      `state
     ?-  +<.action
     %shoot
-      =.  ifist.state  [~ +>.action]
+      =.  shoot-self.state
+        [~ +>.action]
       `state
-    %verbs
-      =.  verbs.state  +>.action
+    %verbose
+      =.  verbose.state
+        +>.action
       `state
-    %delay
-      =.  delay.state  +>.action
+    %poise-delay
+      =.  poise-delay.state
+        +>.action
       `state
-    %flexi
-      =.  delay.state  +>.action
+    %latency
+      =.  latency.state
+        +>.action
       `state
     %rest
       :_  state
         [(brest +>.action) ~]
     %wait
-      ~&  >  +>.action
       :_  state
         [(bwait +>.action) ~]
     %poise
-      =/  oldwen=@da
-        :: bunt if no poise or expired poise
-        ?~  poise.state 
-          *@da
-        ?:  (gte now.bowl (add wen.u.poise.state viv.u.poise.state))
-          *@da
-        wen.u.poise.state
-      =/  wen=@da  (add now.bowl delay.state)
-      =.  poise.state
-        :*  ~
-          who.+>.action 
-          wen
-          flexi.state
+      ?.  =(src.bowl our.bowl)  `state
+      =<
+      =/  new-poise=^poise
+        :*
+          +>.action
+          %+  add  now.bowl
+              poise-delay.state
+          latency.state
         ==
-      :_  state
-        :: TODO add behn call
-        ?:  =(oldwen *@da)  
-          :~
-            poise-card
-            (bwait-proxy wen)
+      =.  shoot-opponent.state  ~
+      ?.  requires-rest
+        =.  poise.state  [~ new-poise]
+        :_  state
+          :~  poise-card
+            (bwait-proxy shoot-time.new-poise)
           ==
-        :~
-          poise-card
-          (brest-proxy oldwen)
-          (bwait-proxy wen)
+      ?~  poise.state  !!
+      =/  old-shoot-time=@da
+        shoot-time.u.poise.state
+      =.  poise  [~ new-poise]
+      :_  state
+        :~  poise-card
+          (brest-proxy old-shoot-time)
+          (bwait-proxy shoot-time.u.poise.state)
         ==
-
+      ::
+      |%
+      ++  requires-rest
+        ?~  poise.state  |
+        =*  poise  u.poise.state
+        ?!  %+  gte
+          now.bowl
+          (add shoot-time.poise latency.poise)
+      --
     ==
   ==
 --

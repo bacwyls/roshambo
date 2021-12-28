@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@urbit/http-api": "^2.1.0",
-    "browserify": "^17.0.0"
+    "browserify": "^17.0.0",
+    "urbit-ob": "^5.0.1"
   }
 }
