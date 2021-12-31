@@ -102,7 +102,7 @@
 |_  bowl=bowl:gall
 ++  init-state
   :*  %0
-    ~  ~  ~  ~s10  ~s2  &
+    ~  ~  ~  ~s10  ~s5  |
   ==
 ++  cord-to-shoot
   |=  shot=cord
@@ -215,12 +215,29 @@
       =.  latency.ipoi  latency.upoi
       =.  u.poise.state  ipoi
       :: reset behn
+      =/  tmp
+        ?:  verbose.state
+        ~&  >  "roshambo: heard back from opponent"
+        ~&  >  "          shooting at:" 
+        ~&  >>  shoot-time.ipoi
+        0  0
       :_  state
       :~
         (brest-proxy old-shoot-time)
         (bwait-proxy shoot-time.ipoi)
+        poise-card
+        game-update-card
       ==
+    ?:  =(shoot-time.upoi shoot-time.ipoi)
+      =/  tmp=@  ?:  verbose.state
+        ~&  >  "roshambo: agreed on shoot-time"
+        ~&  >  "          shooting at:"
+        ~&  >>  shoot-time.upoi
+        0  0
+      :_  state
+        [game-update-card ~]
     :: send my poise again
+    :: opponent shoot-time < our shoot-time
     :_  state
       [poise-card ~]
   %shoot
@@ -232,11 +249,12 @@
     :: assert now in poise time window
     ?.  (is-poise-active poise now.bowl)
       `state
-    :: TODO
-    :: declare win, draw, or fail
     =.  shoot-opponent.state  [~ +.action]
-    ~&  >  "GAME"
-    ~&  >  [shoot-self.state shoot-opponent.state]
+
+    =/  tmp=@  ?:  verbose.state
+      ~&  >  "roshambo result: [you them]"
+      ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
+      0  0
     :_  state
     ~[game-update-card]
   %set
@@ -267,6 +285,9 @@
         [(bwait +>.action) ~]
     %poise
       ?.  =(src.bowl our.bowl)  `state
+      ?:  =(+>.action our.bowl)  
+        :: can't play against yourself, dummy
+        `state
       =<
       =/  new-poise=^poise
         :*

@@ -4,64 +4,25 @@
 <head>
   <title>%roshambo</title>
 
-  <style>
-    body {
-      margin:auto;
-      text-align:center;
-      font-size:1.5vmax;
-    }
-    form#rshb-play-form {
-      background-color:#ddd;
-      padding:10px;
-      border-radius:20px;
-    }
-
-    input[type="submit" i] {
-      border-radius:10px;
-      padding:5px;
-      font-size:1.5vmax;
-    }
-
-    input[type="radio" i] {
-      border:0px;
-      width:10%;
-      height:2em;
-    }
-
-    div#rshb-winner-block {
-      padding:1em;
-      /*background-color:#0f0;*/
-      /*background-color:#f00;
-        color:white;*/
-      /*background-color:#fff;*/
-    }
-
-    div#rshb-play-block {
-      width:20em;
-      margin:auto;
-    }
-
-    form#rshb-play-form {
-      text-align:left;
-    }
-
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-  <!--
-  <script src="script.js"></script>
-  -->
   <script src="bundle.js"></script>
   <script src="/session.js"></script>
-
 </head>
 
 <body>
 
-<h1>%roshambizzy</h1>
-<p style="font-family:monospace">:: [] >%</p>
-<img src="img/plungerfish.jpg" width="50px" style="border-radius:10px;">
+<div id="rshb-header">
+<h1>%roshambo</h1>
+<p id="rshb-runes"style="font-family:monospace">:: [] >%</p>
+</div>
+<a href="/">garden</a> . . . .
+<a href="index.html">home</a> . . . .
+<a href="help.html">help</a> . . . .
+<a href="about.html">about</a>
 <br>
 <hr>
 
@@ -115,12 +76,18 @@
 
   <div id="rshb-play-block">
     <form id="rshb-play-form">
+      <div class="rshb-radio-row">
       <input type="radio" id="rock" value="rock" name="rshb">
-        <label for="rock">%rock</label><br>
+        <label for="rock">rock</label>
+      </div>
+      <div class="rshb-radio-row">
       <input type="radio" id="paper" value="paper" name="rshb">
-        <label for="paper">%paper</label><br>
+        <label for="paper">paper</label>
+      </div>
+      <div class="rshb-radio-row">
       <input type="radio" id="scissors" value="scissors" name="rshb">
-        <label for="scissors">%scissors</label><br><br>
+        <label for="scissors">scissors</label>
+      </div>
 
       <input id="rshb-shoot-button" type="button" value="SHOOT">
     </form>

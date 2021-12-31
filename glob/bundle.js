@@ -27,25 +27,21 @@ function shoot() {
     if(choices[i].checked) {
       chosen = true;
       choices[i].checked = false;
-      console.log(choices[i].value);
       choice = choices[i].value;
     }
   }
 
   opponent = document.getElementById('rshb-opponent-patp');
-  console.log("OPPONENT:");
-  console.log(opponent);
   
-  if(!chosen) {
-    console.log("nothing is chosen");
-  }
-  else {
-    console.log("poking:");
+  if(chosen) {
+    set_you_play("~");
+    set_them_play("~");
+    set_game_result(0);
     urb.poke({ app:'roshambo', mark:'roshambo-ui-shoot',
     json: choice[0]
     });
     urb.poke({ app:'roshambo', mark:'roshambo-ui-poise',
-    json: '~run'
+    json: opponent.innerHTML
     });
   }
 }
@@ -83,20 +79,29 @@ function compute_game_result(shoot_self, shoot_opponent) {
 }
 
 function updateGameState(newGameState) {
-  var shoot_opponent = newGameState['shoot-opponent']['shot'];
-  var shoot_self = newGameState['shoot-self']['shot'];
-  shoot_opponent = char_to_shoot(shoot_opponent);
-  shoot_self = char_to_shoot(shoot_self);
+  var shoot_time = newGameState['poise']['shoot-time'];
+  var current_time = new Date().getTime();
 
-  set_you_play(shoot_self);
-  set_them_play(shoot_opponent);
-  var game_result = compute_game_result(shoot_self, shoot_opponent);
-  set_game_result(game_result);
+  if( current_time >= shoot_time ) {
+    var shoot_opponent = newGameState['shoot-opponent']['shot'];
+    var shoot_self = newGameState['shoot-self']['shot'];
+    shoot_opponent = char_to_shoot(shoot_opponent);
+    shoot_self = char_to_shoot(shoot_self);
+
+    set_you_play(shoot_self);
+    set_them_play(shoot_opponent);
+    var game_result = compute_game_result(shoot_self, shoot_opponent);
+    set_game_result(game_result);
+  }
+  else {
+    var shoot_time_date = new Date(shoot_time);
+    var winnermsg   = document.getElementById('rshb-winner-msg'); 
+    winnermsg.textContent = shoot_time_date.toTimeString();
+  }
 }
 
 
 function exit() {
-  console.log("exit game");
   set_you_play("~");
   set_them_play("~");
   set_game_result(0);
@@ -108,8 +113,6 @@ button.addEventListener('click', exit);
 function play() {
   var them = document.getElementById('rshb-opponent');
   if(urbitob.isValidPatp(them.value)){
-    console.log("play game");
-    console.log(them.value);
     set_you_play("~");
     set_them_play("~");
     set_opponent_patp(them.value);

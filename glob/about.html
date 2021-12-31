@@ -1,0 +1,71 @@
+<!doctype html>
+
+<html>
+<head>
+  <title>%roshambo</title>
+
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+<div id="rshb-header">
+<h1>%roshambo</h1>
+<p id="rshb-runes"style="font-family:monospace">:: [] >%</p>
+</div>
+<a href="/">garden</a> . . . .
+<a href="index.html">home</a> . . . .
+<a href="help.html">help</a> . . . .
+<a href="about.html">about</a>
+<br>
+<hr>
+
+<div style="text-align:left">
+<h1> About </h1>
+<p> Developed by <strong>~bacwyl-samweg</strong></p>
+<p> Source: <a href="https://github.com/bacwyls/roshambo"> click here </a> </p>
+<hr>
+<p> roshambo is a messy gall app made for fun.</p>
+<p> Out of laziness, I decided not to bother with a frontend framework. So this is just hand-made HTML/CSS/JS bundled with @urbit/http-api and urbit-ob using browserify.</p>
+<p> A bonus of this is that the frontend logic is simple and legible, so you can read the source if you're worried about malicious frontend code.</p>
+<hr>
+<h2> Play roshambo in dojo </h2>
+<p> Step 1: set the app to verbose mode. </p>
+<tt>:roshambo|verbose &amp;</tt>
+<br><br>
+<p> Step 2: <strong>shoot</strong> </p>
+<tt>:roshambo|shoot %r</tt><br>
+or
+<tt>:roshambo|shoot %p</tt><br>
+or
+<tt>:roshambo|shoot %s</tt>
+<br><br>
+<p> Step 3: <strong>poise</strong> </p>
+<tt>:roshambo|poise ~sampel-palnet</tt><br>
+<p> When you and an opponent <strong>poise</strong> against one another, your agents negotiate an exact time at which they will share <strong>shoot</strong> values.</p>
+<p> this time will be printed to the screen. You can change your <strong>shoot</strong> any time before the shoot-time. </p>
+<br>
+
+<p> Step 4: give it a sec </p>
+<p> If successful, the results will be printed to the screen sometime between shoot-time and shoot-time + latency. </p>
+<p> Otherwise you may need to tweak your latency and poise-delay values. </p>
+<hr>
+<h3> Other commands </h3>
+<p> latency and poise-delay are @dr values used in negotiating a game. They have default values which may not be ideal for play depending on the quality of your p2p connection. These could be increased for a slow connection, or decreased for a fast connection. </p>
+<tt>:roshambo|latency ~sX</tt><br>
+<p> sets your latency value to X seconds. </p>
+<p> If I have a latency of X seconds, my agent will accept a shoot until X seconds after the shoot-time.</p>
+<p> If too long, the opponent could technically cheat. Too short and your packets won't ever make it. </p>
+<br>
+<tt>:roshambo|poise-delay ~sY</tt><br>
+<p> sets your poise-delay value to Y seconds. </p>
+<p> If I have a poise-delay of Y seconds, the shoot-time for my game will be at least Y seconds after I poise. </p>
+<p> Agents settle on the larger poise-delay. </p>
+</div>
+
+</body>
+</html>

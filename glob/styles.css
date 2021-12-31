@@ -1,0 +1,70 @@
+@media (max-width: 700px) {
+body {
+  font-size:2.5vmax !important;
+}
+}
+
+body {
+  margin:auto;
+  margin-left:10%;
+  margin-right:10%;
+  text-align:center;
+  font-size:1.5vmax;
+}
+form#rshb-play-form {
+  background-color:#ddd;
+  padding:10px;
+  border-radius:2px;
+}
+
+input {
+  font-size:inherit;
+}
+
+input[type="radio" i] {
+/*  border:0px;
+*/
+  width:2em;
+  height:2em;
+}
+input#rshb-shoot-button {
+  margin-top:2em;
+}
+
+
+div#rshb-winner-block {
+  padding:1em;
+}
+
+div#rshb-play-block {
+  /*width:20em;*/
+  margin:auto;
+}
+
+form#rshb-play-form {
+  background-color:#aaa;
+  text-align:left;
+  width:80%;
+  margin:auto;
+  display:table;
+  margin-bottom:1em;
+}
+
+div.rshb-radio-row {
+  display:table-row;
+  vertical-align:middle;
+}
+div.rshb-radio-row label{
+  margin-left:1em;
+  margin-bottom:1em;
+}
+div.rshb-radio-row input{
+  margin:0px;
+}
+
+div#rshb-header {
+  padding:1em;
+  background-color:yellow;
+  border-radius:2px;
+}
+
