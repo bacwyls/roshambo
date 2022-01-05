@@ -16,8 +16,82 @@ urb.subscribe({
   });
 
 
-function shoot() {
+// called for subscribe gifts
+// %roshambo sends its full state upon:
+// establishing a game
+// and
+// getting game results
+var global_timer;
+var global_shoot_time;
+function updateGameState(newGameState) {
+  var shoot_time = newGameState['poise']['shoot-time'];
+  var latency = newGameState['poise']['latency'];
+  var current_time = new Date().getTime();
+  global_shoot_time = shoot_time;
 
+  if((current_time >= shoot_time) && (current_time < shoot_time+latency)) {
+    // results are in
+    var shoot_opponent = newGameState['shoot-opponent']['shot'];
+    var shoot_self = newGameState['shoot-self']['shot'];
+    shoot_opponent = char_to_shoot(shoot_opponent);
+    shoot_self = char_to_shoot(shoot_self);
+
+    set_you_play(shoot_self);
+    set_them_play(shoot_opponent);
+    var game_result = compute_game_result(shoot_self, shoot_opponent);
+    set_game_status(game_result);
+  }
+  else if(current_time < shoot_time) {
+    // game is established
+    global_timer = setInterval(setTimer, 500);
+    set_game_status(1);
+  }
+}
+
+function setTimer() {
+  var statusmsg = document.getElementById('rshb-status-msg'); 
+  var current_time = new Date().getTime();
+  var diff = global_shoot_time - current_time;
+  statusmsg.textContent = Math.ceil(diff/1000) + " seconds.";
+  if(diff < 1000) {
+    clearInterval(global_timer);
+  }
+}
+
+// used in updateGameState
+function char_to_shoot(c) {
+  if(c == "r"){
+    return "rock";
+    }
+  else if(c == "p"){
+    return "paper";
+    }
+  else if(c == "s"){
+    return "scissors";
+    }
+  else return null;
+}
+
+// used in updateGameState
+function compute_game_result(shoot_self, shoot_opponent) {
+  shoot_self = shoot_self[0];
+  shoot_opponent = shoot_opponent[0];
+
+  if(shoot_self == shoot_opponent) {
+    return 4;
+  }
+  if( ((shoot_self == "r") && (shoot_opponent == "s")) ||
+      ((shoot_self == "s") && (shoot_opponent == "p")) ||
+      ((shoot_self == "p") && (shoot_opponent == "r")) ){
+    return 2;
+  }
+  return 3;
+}
+
+
+// set shoot and poise
+// uses http-api pokes
+function shoot() {
   var choices = document.getElementsByName('rshb');
 
   var chosen = false;
@@ -35,89 +109,46 @@ function shoot() {
   if(chosen) {
     set_you_play("~");
     set_them_play("~");
-    set_game_result(0);
+
     urb.poke({ app:'roshambo', mark:'roshambo-ui-shoot',
-    json: choice[0]
+      json: choice[0]
     });
-    urb.poke({ app:'roshambo', mark:'roshambo-ui-poise',
-    json: opponent.innerHTML
-    });
+
+    // don't reset %poise if already set
+    if(global_game_status != 1 ) {
+      urb.poke({ app:'roshambo', mark:'roshambo-ui-poise',
+        json: opponent.innerHTML
+      });
+
+      set_game_status(0);
+    }
+
   }
 }
-
 button = document.getElementById('rshb-shoot-button'); 
 button.addEventListener('click', shoot);
 
-function char_to_shoot(c) {
-  if(c == "r"){
-    return "rock";
-    }
-  else if(c == "p"){
-    return "paper";
-    }
-  else if(c == "s"){
-    return "scissors";
-    }
-  else return null;
-}
-
-function compute_game_result(shoot_self, shoot_opponent) {
-  shoot_self = shoot_self[0];
-  shoot_opponent = shoot_opponent[0];
-
-  if(shoot_self == shoot_opponent) {
-    return 3;
-  }
-  if( ((shoot_self == "r") && (shoot_opponent == "s")) ||
-      ((shoot_self == "s") && (shoot_opponent == "p")) ||
-      ((shoot_self == "p") && (shoot_opponent == "r")) ){
-    return 1;
-  }
-  return 2;
-  
-}
-
-function updateGameState(newGameState) {
-  var shoot_time = newGameState['poise']['shoot-time'];
-  var current_time = new Date().getTime();
-
-  if( current_time >= shoot_time ) {
-    var shoot_opponent = newGameState['shoot-opponent']['shot'];
-    var shoot_self = newGameState['shoot-self']['shot'];
-    shoot_opponent = char_to_shoot(shoot_opponent);
-    shoot_self = char_to_shoot(shoot_self);
-
-    set_you_play(shoot_self);
-    set_them_play(shoot_opponent);
-    var game_result = compute_game_result(shoot_self, shoot_opponent);
-    set_game_result(game_result);
-  }
-  else {
-    var shoot_time_date = new Date(shoot_time);
-    var winnermsg   = document.getElementById('rshb-winner-msg'); 
-    winnermsg.textContent = shoot_time_date.toTimeString();
-  }
-}
-
-
+// exit game
 function exit() {
   set_you_play("~");
   set_them_play("~");
-  set_game_result(0);
+  set_game_status(0);
   set_ui_state(0);
 }
 button = document.getElementById('rshb-leave-button'); 
 button.addEventListener('click', exit);
 
+// start game
 function play() {
   var them = document.getElementById('rshb-opponent');
-  if(urbitob.isValidPatp(them.value)){
-    set_you_play("~");
-    set_them_play("~");
-    set_opponent_patp(them.value);
-    set_game_result(0);
-    set_ui_state(2);
+  if(!urbitob.isValidPatp(them.value)){
+    return;
   }
+  set_you_play("~");
+  set_them_play("~");
+  set_opponent_patp(them.value);
+  set_game_status(0);
+  set_ui_state(2);
 }
 button = document.getElementById('rshb-start-button'); 
 button.addEventListener('click', play);
@@ -145,35 +176,45 @@ function set_ui_state(state) {
   }
 }
 
-function set_game_result(result) {
-  var winnerblock = document.getElementById('rshb-winner-block');
-  var winnermsg   = document.getElementById('rshb-winner-msg'); 
+var global_game_status;
+function set_game_status(game_status) {
+  var statusblock= document.getElementById('rshb-status-block');
+  var statusmsg   = document.getElementById('rshb-status-msg'); 
+  global_game_status = game_status;
 
-  if(result == 0) {
+  switch(game_status) {
+  case 0:
     // no current winner
-    winnerblock.style.removeProperty('background-color');
-    winnerblock.style.color = "black";
-    winnermsg.textContent = "...";
-  }
-  else if (result == 1) {
+    statusblock.style.removeProperty('background-color');
+    statusblock.style.color = "black";
+    statusmsg.textContent = "...";
+    break;
+  case 1:
+    // confirmed time
+    statusblock.style.removeProperty('background-color');
+    statusblock.style.color = "black";
+    break;
+  case 2:
     // you win
-    winnerblock.style.backgroundColor = "green";
-    winnerblock.style.color = "white";
-    winnermsg.textContent = "you win!";
-  }
-  else if (result == 2) {
+    statusblock.style.backgroundColor = "green";
+    statusblock.style.color = "white";
+    statusmsg.textContent = "you win!";
+    break;
+  case 3:
     // you lose
-    winnerblock.style.backgroundColor = "red";
-    winnerblock.style.color = "white";
-    winnermsg.textContent = "you lose :-(";
-  }
-  if(result == 3) {
+    statusblock.style.backgroundColor = "red";
+    statusblock.style.color = "white";
+    statusmsg.textContent = "you lose :-(";
+    break;
+  case 4:
     // tie
-    winnerblock.style.backgroundColor = "yellow";
-    winnerblock.style.color = "black";
-    winnermsg.textContent = "you tied :/";
+    statusblock.style.backgroundColor = "yellow";
+    statusblock.style.color = "black";
+    statusmsg.textContent = "you tied :/";
+    break;
   }
 }
+
 function set_opponent_patp(patp) {
   document.getElementById('rshb-opponent-patp').textContent = patp;
 }

@@ -62,6 +62,16 @@
   ?.  =(our.bowl src.bowl)  `this
   ?.  (is-poise-active u.poise.state now.bowl)
     `this
+  =/  tmp=@  ?:  verbose.state
+    ~&  >
+      %+  weld
+      "roshambo: shooting "
+      %+  weld
+      (cite:title opponent.u.poise.state)
+      %+  weld
+      " with "
+      (shoot-to-tape u.shoot-self.state)
+    0  0
   :_  this
     :~  shoot-card
     ==  
@@ -104,6 +114,15 @@
   :*  %0
     ~  ~  ~  ~s10  ~s5  |
   ==
+++  shoot-to-tape
+  |=  =shoot
+  ?:  =(shoot %r)
+    "rock"
+  ?:  =(shoot %p)
+    "paper"
+  ?:  =(shoot %s)
+    "scissors"
+  !!
 ++  cord-to-shoot
   |=  shot=cord
   ?:  =(shot 'r')
@@ -177,6 +196,7 @@
   =*  shoot
     ?~  shoot-self.state  !!
     u.shoot-self.state
+
   :*  %pass   /poke-wire   %agent
     [opponent.poise %roshambo]
     %poke  %roshambo-action
@@ -208,7 +228,8 @@
       u.poise.state
     =/  upoi=^poise
       +.action
-    ?.  =(src.bowl opponent.ipoi)  !!
+    ?.  =(src.bowl opponent.ipoi)
+      `state
     ?:  (gth shoot-time.upoi shoot-time.ipoi)
       =/  old-shoot-time=@da  shoot-time.ipoi
       =.  shoot-time.ipoi  shoot-time.upoi
@@ -218,8 +239,12 @@
       =/  tmp
         ?:  verbose.state
         ~&  >  "roshambo: heard back from opponent"
-        ~&  >  "          shooting at:" 
-        ~&  >>  shoot-time.ipoi
+        ~&  >  "          shooting in:" 
+        ~&  >>  
+          ^-  @dr
+          %+  sub
+            shoot-time.ipoi
+            now.bowl
         0  0
       :_  state
       :~
@@ -231,8 +256,12 @@
     ?:  =(shoot-time.upoi shoot-time.ipoi)
       =/  tmp=@  ?:  verbose.state
         ~&  >  "roshambo: agreed on shoot-time"
-        ~&  >  "          shooting at:"
-        ~&  >>  shoot-time.upoi
+        ~&  >  "          shooting in:"
+        ~&  >>  
+          ^-  @dr
+          %+  sub
+            shoot-time.ipoi
+            now.bowl
         0  0
       :_  state
         [game-update-card ~]
@@ -250,9 +279,8 @@
     ?.  (is-poise-active poise now.bowl)
       `state
     =.  shoot-opponent.state  [~ +.action]
-
     =/  tmp=@  ?:  verbose.state
-      ~&  >  "roshambo result: [you them]"
+      ~&  >  "roshambo  RESULT [you them]"
       ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
       0  0
     :_  state
@@ -262,6 +290,14 @@
       `state
     ?-  +<.action
     %shoot
+      =/  can-shoot=?
+        ?~  poise.state  &
+        ?!  (is-poise-active u.poise.state now.bowl)
+      ?.  can-shoot
+        =/  tmp=@  ?:  verbose.state
+          ~&  >>>  "roshambo: you cant set shoot during the game, cheater!"
+          0  0
+        `state
       =.  shoot-self.state
         [~ +>.action]
       `state
