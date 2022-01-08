@@ -7,7 +7,7 @@
   <link rel="shortcut icon" href="img/bacwyls.png" type="image/x-icon">
   <link rel="stylesheet" href="styles.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="jquery-3.6.0.min.js"></script>
 
   <script src="bundle.js"></script>
   <script src="/session.js"></script>
@@ -15,86 +15,81 @@
 
 <body>
 
-<div id="rshb-header">
+<div id="header">
 <h1>%roshambo</h1>
-<p id="rshb-runes"style="font-family:monospace">:: [] >%</p>
-</div>
-<a href="/">garden</a> . . . .
-<a href="index.html">home</a> . . . .
-<a href="help.html">help</a> . . . .
+<a href="/">garden</a>
+<a href="index.html">home</a>
+<a href="help.html">help</a>
 <a href="about.html">about</a>
-<br>
-<hr>
+</div>
 
-<div id="rshb-no-game">
+<div id="no-game">
   <p>select your opponent.</p>
 
-  <form id="rshb-start-form">
-  <input id="rshb-opponent" type="text">
-  <input id="rshb-start-button" type="button" value="OK">
+  <form id="start-form" onsubmit="return false;">
+    <input id="opponent" type="text">
+    <input id="start-button" type="button" value="OK">
   </form>
-
-  <div id="rshb-start-wait" style="display:none;">
-    <p>waiting...</p>
-  </div>
-  <hr>
 </div>
 
-
-<div id="rshb-game" style="display:none;">
+<div id="game" style="display:none;">
   <p> your opponent is:
       <strong>
-      <span id="rshb-opponent-patp"> ~zod </span>
-      </strong> </p>
-
-  <form id="rshb-leave-form">
-  <input id="rshb-leave-button" type="button" value="EXIT">
-  </form>
-  
-  <br>
-  <hr>
-
-  <p>
-      <strong>
-      <span id="rshb-you-patp"> you </span>:
+      <span id="opponent-patp"> ~zod </span>
       </strong>
-    <span id="rshb-you-play"> ~ </span>
   </p>
 
-  <p>
-      <strong>
-      <span id="rshb-them-patp"> them </span>:
-      </strong>
-    <span id="rshb-them-play"> ~ </span>
+  <form id="leave-form">
+  <input id="leave-button" type="button" value="EXIT">
+  </form>
   <br>
 
-  <div id="rshb-status-block">
-    <span id="rshb-status-msg">...</span>
+  <div id="play-block">
+  <table id="play-table">
+  <tr>
+  <th>
+    <span> you: </span>
+  </th>
+  <th>
+    <span> them: </span>
+  </th>
+  <tr>
+  <td>
+    <span id="you-play"> ~ </span>
+  </td>
+  <td>
+    <span id="them-play"> ~ </span>
+  </td>
+  </tr>
+  </table>
+
+  <div id="status-block">
+    <span id="status-msg">...</span>
   </div>
 
-  <hr>
-
-  <div id="rshb-play-block">
-    <form id="rshb-play-form">
-      <div class="rshb-radio-row">
+  <form id="play-form">
+    <table>
+    <tr>
+    <th>::</th>
+    <th>[]</th>
+    <th>&gt;%</th>
+    </tr>
+    <tr>
+    <td>
       <input type="radio" id="rock" value="rock" name="rshb">
-        <label for="rock">rock</label>
-      </div>
-      <div class="rshb-radio-row">
+    </td>
+    <td>
       <input type="radio" id="paper" value="paper" name="rshb">
-        <label for="paper">paper</label>
-      </div>
-      <div class="rshb-radio-row">
+    </td>
+    <td>
       <input type="radio" id="scissors" value="scissors" name="rshb">
-        <label for="scissors">scissors</label>
-      </div>
-
-      <input id="rshb-shoot-button" type="button" value="SHOOT">
-    </form>
+    </td>
+    </tr>
+    </table>
+    <input id="shoot-button" type="button" value="Choose">
+  </form>
   </div>
-
 </div>
-
 
 </body>
 </html>

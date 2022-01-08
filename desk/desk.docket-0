@@ -1,6 +1,6 @@
 :~  title+'roshambo'
     info+'simple rock paper scissors game'
-    color+0xff.ff00
+    color+0xff.bc00
     image+'../roshambo/img/roshambo.png'
     base+'roshambo'
     glob-ames+[~bus 0v0]

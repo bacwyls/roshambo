@@ -207,6 +207,13 @@
   ?&  (gte now shoot-time.poise)
     (lte now (add shoot-time.poise latency.poise))
   ==
+::
+:: from user:
+::   %set %poise
+::   %set %shoot
+:: from opponent:
+::   %shoot
+::   %poise
 ++  handle-action
   |=  =action
   ^-  (quip card _state)
@@ -218,6 +225,22 @@
     =.  shoot-self.state  ~
     =.  shoot-opponent.state  ~
     `state
+  %shoot
+    ?~  poise.state  `state
+    =*  poise
+      u.poise.state
+    ?.  =(src.bowl opponent.poise)
+      `state
+    ?.  (is-poise-active poise now.bowl)
+      `state
+    ?~  shoot-self.state  `state
+    =.  shoot-opponent.state  [~ +.action]
+    =/  tmp=@  ?:  verbose.state
+      ~&  >  "roshambo  RESULT [you them]"
+      ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
+      0  0
+    :_  state
+    ~[game-update-card]
   %poise
     :: agents will settle on the later time
     ?~  poise.state
@@ -269,38 +292,10 @@
     :: opponent shoot-time < our shoot-time
     :_  state
       [poise-card ~]
-  %shoot
-    ?~  poise.state  `state
-    =*  poise
-      u.poise.state
-    ?.  =(src.bowl opponent.poise)
-      `state
-    :: assert now in poise time window
-    ?.  (is-poise-active poise now.bowl)
-      `state
-    =.  shoot-opponent.state  [~ +.action]
-    =/  tmp=@  ?:  verbose.state
-      ~&  >  "roshambo  RESULT [you them]"
-      ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
-      0  0
-    :_  state
-    ~[game-update-card]
   %set
     ?.  =(src.bowl our.bowl)
       `state
     ?-  +<.action
-    %shoot
-      =/  can-shoot=?
-        ?~  poise.state  &
-        ?!  (is-poise-active u.poise.state now.bowl)
-      ?.  can-shoot
-        =/  tmp=@  ?:  verbose.state
-          ~&  >>>  "roshambo: you cant set shoot during the game, cheater!"
-          0  0
-        `state
-      =.  shoot-self.state
-        [~ +>.action]
-      `state
     %verbose
       =.  verbose.state
         +>.action
@@ -319,6 +314,18 @@
     %wait
       :_  state
         [(bwait +>.action) ~]
+    %shoot
+      =/  can-shoot=?
+        ?~  poise.state  &
+        ?!  (is-poise-active u.poise.state now.bowl)
+      ?.  can-shoot
+        =/  tmp=@  ?:  verbose.state
+          ~&  >>>  "roshambo: you cant set shoot during the game, cheater!"
+          0  0
+        `state
+      =.  shoot-self.state
+        [~ +>.action]
+      `state
     %poise
       ?.  =(src.bowl our.bowl)  `state
       ?:  =(+>.action our.bowl)  
@@ -333,6 +340,7 @@
           latency.state
         ==
       =.  shoot-opponent.state  ~
+      =.  shoot-self.state  ~
       ?.  requires-rest
         =.  poise.state  [~ new-poise]
         :_  state

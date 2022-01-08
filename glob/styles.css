@@ -1,6 +1,8 @@
 @media (max-width: 700px) {
 body {
   font-size:2.5vmax !important;
+  margin-left:2% !important;
+  margin-right:2% !important;
 }
 }
 
@@ -9,68 +11,94 @@ body {
   margin-left:10%;
   margin-right:10%;
   text-align:center;
-  font-size:1.5vmax;
-}
-form#rshb-play-form {
-  background-color:#ddd;
-  padding:10px;
-  border-radius:2px;
 }
 
 input {
   font-size:inherit;
+  cursor:pointer;
+}
+
+#start-form {
+  width:100%;
+  overflow:hidden;
 }
 
 input[type="radio" i] {
-/*  border:0px;
-*/
+  border:0px;
   width:2em;
   height:2em;
 }
-input#rshb-shoot-button {
-  margin-top:2em;
+
+
+input#shoot-button {
+  width:80%;
+  padding:1em;
+  margin:1em;
 }
 
+div#status-block {
+  display:inline-block;
+  margin:auto;
+  margin-top:1.5em;
+  margin-bottom:1.5em;
+  padding:1em;
+  border-radius:1em;
+}
 
-div#rshb-status-block {
+div#play-block {
+  margin:auto;
+  padding:.5em;
+  background-color:#ddd;
+  border-radius:1em;
+}
+
+#play-form td, #play-form th {
   padding:1em;
 }
 
-div#rshb-play-block {
-  /*width:20em;*/
-  margin:auto;
+#play-form th {
+  font-family:monospace;
+  text-align:center;
+  padding-bottom:0em;
 }
 
-form#rshb-play-form {
-  background-color:#aaa;
-  text-align:left;
-  width:80%;
+form#play-form {
   margin:auto;
   display:table;
   margin-bottom:1em;
+  border-radius:1em;
 }
 
-div.rshb-radio-row {
-  display:table-row;
-  vertical-align:middle;
-}
-div.rshb-radio-row label{
-  margin-left:1em;
-  margin-bottom:1em;
-}
-div.rshb-radio-row input{
-  margin:0px;
-}
-
-div#rshb-header {
+div#header {
   padding:1em;
-  background-color:yellow;
+  background-color:#ffbc00;
   margin-bottom:.5em;
-  border-radius:5px;
+  border-radius:1em;
+}
+
+#header a {
+  color:black;
+  padding:.5em 1em;
 }
 
 img.dev-avatar {
   margin:auto;
   width:10%;
+}
+
+table#play-table {
+  margin:auto;
+  border-radius:1em;
+}
+#play-table td, #play-table th {
+  padding:1em 2em;
+}
+table#play-table th {
+  padding-bottom:0em;
+  text-decoration:underline;
+}
+
+tt {
+  background-color:#ddd;
 }
 

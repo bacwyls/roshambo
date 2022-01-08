@@ -8,84 +8,56 @@
   <link rel="stylesheet" href="styles.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
 </head>
 
 <body>
 
-<div id="rshb-header">
+<div id="header">
 <h1>%roshambo</h1>
-<p id="rshb-runes"style="font-family:monospace">:: [] >%</p>
-</div>
-<a href="/">garden</a> . . . .
-<a href="index.html">home</a> . . . .
-<a href="help.html">help</a> . . . .
+<a href="/">garden</a>
+<a href="index.html">home</a>
+<a href="help.html">help</a>
 <a href="about.html">about</a>
-<br>
-<hr>
+</div>
 
 <div style="text-align:left">
 <h1> About </h1>
-<p> Developed by <strong>~bacwyl-samweg</strong></p>
+<p> Made by <strong>~bacwyl-samweg</strong></p>
 <img src="img/bacwyls.png" class="dev-avatar">
 <p> Source: <a href="https://github.com/bacwyls/roshambo"> click here </a> </p>
-<hr>
-<p> roshambo is a gall app with a web interface and a dojo interface</p>
 <hr>
 <h2> gall app </h2>
 <p> most of the logic is to accomplish the following: </p>
 <p> if two users tell their agents to %poise against one another, the agents will chat until they settle on a time window. </p>
-<p> they'll set %behn timers for t0, and theyll listen for the opponent from t0 until t0+n </p>
+<p> they'll set behn timers for t0. At t0, they share shoot values and listen for the opponent until t0+n </p>
 <p>-</p>
 <p> then theres some ugly stuff about how I'm dealing with http-api inputs &amp; conditional (?verbose) debug prints.</p>
 <hr>
 <h2> web interface </h2>
-<p> This frontend is hand-written HTML/CSS/JS bundled with http-api and urbit-ob using <a href="https://browserify.org/">browserify</a>.</p>
-<p> The <a href="script.js">UI logic</a> is a short (messy) list of click event functions and a few calls to http-api. </p>
+<p> This frontend is hand-written HTML/CSS/JS bundled with @urbit/http-api using <a href="https://browserify.org/">browserify</a>.</p>
+<p> The <a href="script.js">UI logic</a> is a short list of click event functions and a few calls to http-api. </p>
 <hr>
 <h2> dojo interface </h2>
-<p> Step 1: set the app to verbose mode. </p>
-<blockquote>
-<tt>:roshambo|verbose &amp;</tt>
-</blockquote>
-<br>
-<p> Step 2: <strong>shoot</strong> </p>
-<blockquote>
-<tt>:roshambo|shoot %r</tt><br>
-<tt>:roshambo|shoot %p</tt><br>
-<tt>:roshambo|shoot %s</tt>
-</blockquote>
-<br>
-<p> Step 3: <strong>poise</strong> </p>
-<blockquote>
-<tt>:roshambo|poise ~sampel-palnet</tt><br>
-</blockquote>
-<p> When you and an opponent <strong>poise</strong> against one another, your agents negotiate an exact time at which they will share <strong>shoot</strong> values.</p>
-<p> this time will be printed to the screen. You can change your <strong>shoot</strong> any time before the shoot-time. </p>
-<br>
-
-<p> Step 4: give it a sec </p>
-<p> If successful, the results will be printed to the screen sometime between shoot-time and shoot-time + latency. </p>
-<p> Otherwise you may need to tweak your latency and poise-delay values. </p>
-<hr>
-<h3> Other commands </h3>
-<p> latency and poise-delay are @dr values used in negotiating a game. They have default values which may not be ideal for play depending on the quality of your p2p connection. These could be increased for a slow connection, or decreased for a fast connection. </p>
+<p> The user can <tt>:roshambo|poise ~sampel-palnet</tt> and <tt>:roshambo|shoot (%r|%p|%s)</tt></p>
+<p> if you want to see the game in dojo you can <tt>:roshambo|verbose &amp;</tt> or periodically <tt>:roshambo %print-state</tt></p>
+<p> you can also adjust some constants that are used in negotiating the time-window for a game. </p>
 <blockquote>
 <tt>:roshambo|latency ~sX</tt><br>
 </blockquote>
 <p> sets your latency value to X seconds. </p>
 <p> If I have a latency of X seconds, my agent will accept a shoot until X seconds after the shoot-time.</p>
-<p> This can be generous. Too short (&lt; actual_latency) and your shoots won't make it in time.</p>
-<p>If its too long (&gt; 2 * actual_latency), then someone with a modded %roshambo could technically cheat. But thats pretty unlikely.</p>
+<p> Too short (&lt; actual_latency) and your shoots won't make it in time.</p>
+<p> Too long (&gt; 2 * actual_latency) and someone with a modded %roshambo could technically cheat.</p>
+<p> This can be (and is by default) generous, since you probably arent too worried about cheaters.</p>
 <br>
 <blockquote>
 <tt>:roshambo|poise-delay ~sY</tt><br>
 </blockquote>
 <p> sets your poise-delay value to Y seconds. </p>
 <p> If I have a poise-delay of Y seconds, the shoot-time for my game will be at least Y seconds after I poise. </p>
-<p> Give it enough for your agents to poke back and forth a few times. </p>
-<p> Agents settle on the larger poise-delay. </p>
+<p> Give it enough for players to set their shoot values and agents to poke back and forth a few times. </p>
+<br>
+<p> Agents settle on the proposed time-window which is further in the future. </p>
 </div>
 
 </body>
