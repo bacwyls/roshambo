@@ -112,7 +112,7 @@
 |_  bowl=bowl:gall
 ++  init-state
   :*  %0
-    ~  ~  ~  ~s10  ~s5  |
+    ~  ~  ~  ~s10  ~s20  &
   ==
 ++  shoot-to-tape
   |=  =shoot

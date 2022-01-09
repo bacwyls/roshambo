@@ -22,20 +22,30 @@
 
 <div style="text-align:left">
 <h1> About </h1>
+<p> roshambo is a peer-to-peer rock paper scissors game. </p>
 <p> Made by <strong>~bacwyl-samweg</strong></p>
 <img src="img/bacwyls.png" class="dev-avatar">
 <p> Source: <a href="https://github.com/bacwyls/roshambo"> click here </a> </p>
 <hr>
-<h2> gall app </h2>
-<p> most of the logic is to accomplish the following: </p>
-<p> if two users tell their agents to %poise against one another, the agents will chat until they settle on a time window. </p>
-<p> they'll set behn timers for t0. At t0, they share shoot values and listen for the opponent until t0+n </p>
-<p>-</p>
-<p> then theres some ugly stuff about how I'm dealing with http-api inputs &amp; conditional (?verbose) debug prints.</p>
-<hr>
 <h2> web interface </h2>
 <p> This frontend is hand-written HTML/CSS/JS bundled with @urbit/http-api using <a href="https://browserify.org/">browserify</a>.</p>
-<p> The <a href="script.js">UI logic</a> is a short list of click event functions and a few calls to http-api. </p>
+<p> The <a href="script.js">UI logic (pre-bundle)</a> is a short list of click event functions and a few pokes to the local agent. </p>
+<p> I'm allergic to js frameworks, and pretty happy with the webdev 101 way of making a webpage. </p>
+<p> Still not sure if it makes sense to do it this way... but its easy, and afaict React frontends have a copy of @urbit/http-api in their static js too - its just incomprehensible. </p>
+<p> A plus for this frontend is you can actually read the <a href="bundle.js">bundled js</a>. It's about 1k lines, the vast majority of which is just a copy of the http-api source. </p>
+<p> I left out urbit-ob bc that brought it to 9k lines... so you're welcome to try playing RPS against ~fart-boobs if you want. I just doubt he'll respond.</p>
+<hr>
+<h2> gall app </h2>
+<p> RPS requires some precise timing, which is difficult to accomplish over ames.. </p>
+<p> both players in RPS must reveal their choice at roughly the same time, otherwise the later player can always win.</p>
+<p> roshambo implements a simple handshake where two agents agree upon a time window in the near future [t0, t0+n] </p>
+<p> they set behn timers for t0. At t0, they share shoot values via poke and listen for the opponent until t0+n </p>
+<p> So, in theory, agent A will not know agent B's choice until he's already commited to his own. </p>
+<p> In practice, this is usually the case. But I've seen these %shoot pokes arrive between 20 seconds too late and 1 second too early (proof that urbit is witchcraft.)</p>
+<p> Also, one could technically run a modded roshambo that waits for the opponents shoot and responds with the winning answer. This works as long as n &gt; 2*real_latency, which it almost always will be.
+<p>If you read the source, you'll see I sort of doubled up on the handshake / time-window logic. </p>
+<p>So theres a constant, <tt>poise-delay</tt>, which defines both the lifetime/validity of a handshake initiation, and the amount of time both players will have to wait post-handshake before t0 happens. </p>
+<p>These should probably each be their own constant (the former should be about 60 sec, and the latter about 5), but it would require some refactoring that I'm not interested in doing.</p>
 <hr>
 <h2> dojo interface </h2>
 <p> The user can <tt>:roshambo|poise ~sampel-palnet</tt> and <tt>:roshambo|shoot (%r|%p|%s)</tt></p>
@@ -48,14 +58,15 @@
 <p> If I have a latency of X seconds, my agent will accept a shoot until X seconds after the shoot-time.</p>
 <p> Too short (&lt; actual_latency) and your shoots won't make it in time.</p>
 <p> Too long (&gt; 2 * actual_latency) and someone with a modded %roshambo could technically cheat.</p>
-<p> This can be (and is by default) generous, since you probably arent too worried about cheaters.</p>
+<p> This can be (and is by default) very generous, since you probably arent too worried about cheaters, and real latency over ames is highly variable.</p>
+<p> It functions as more of an expiry time for games rather than a guarantee of honest play. </p>
 <br>
 <blockquote>
 <tt>:roshambo|poise-delay ~sY</tt><br>
 </blockquote>
 <p> sets your poise-delay value to Y seconds. </p>
 <p> If I have a poise-delay of Y seconds, the shoot-time for my game will be at least Y seconds after I poise. </p>
-<p> Give it enough for players to set their shoot values and agents to poke back and forth a few times. </p>
+<p> Give it enough for the opponent to poise back and agents to handshake. </p>
 <br>
 <p> Agents settle on the proposed time-window which is further in the future. </p>
 </div>

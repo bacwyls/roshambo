@@ -69,15 +69,7 @@ button.addEventListener('click', exit);
 var global_opponent;
 function play() {
   var them = document.getElementById('opponent');
-  /*
-  if(!urbitob.isValidPatp(them.value)){
-    return;
-  }
-  */
   global_opponent = them.value;
-
-  urb.poke({ app:'roshambo', mark:'roshambo-ui-poise',
-             json: global_opponent });
 
   setYouPlay("~");
   setThemPlay("?");
@@ -104,9 +96,6 @@ function shoot() {
 
   if(!chosen) return;
 
-  setYouPlay(choice);
-  setThemPlay("?");
-
   // %poise if not already set
   var current_time = new Date().getTime();
   if( global_game_status != 1 ||
@@ -114,13 +103,14 @@ function shoot() {
     urb.poke({ app:'roshambo',
                mark:'roshambo-ui-poise',
                json: global_opponent });
+    urb.poke({ app:'roshambo',
+               mark:'roshambo-ui-shoot',
+               json: choice[0] });
     setGameStatus(0);
+    setYouPlay(choice);
+    setThemPlay("?");
+
   }
-
-  urb.poke({ app:'roshambo',
-             mark:'roshambo-ui-shoot',
-             json: choice[0] });
-
 }
 button = document.getElementById('shoot-button'); 
 button.addEventListener('click', shoot);
