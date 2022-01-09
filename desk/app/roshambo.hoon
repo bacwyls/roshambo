@@ -257,8 +257,8 @@
       `state
     :: TODO temporarily setting to earlier time.
     :: just testing rn, may need to set back
-    ?:  ?& (lth shoot-time.upoi shoot-time.ipoi)
-           (gth shoot-time.upoi (add now.bowl latency.state))
+    ?:  ?&  (lth shoot-time.upoi shoot-time.ipoi)
+            (gth shoot-time.upoi (add now.bowl latency.state))
         ==
       =/  old-shoot-time=@da  shoot-time.ipoi
       =.  shoot-time.ipoi  shoot-time.upoi
