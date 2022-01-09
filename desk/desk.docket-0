@@ -3,7 +3,7 @@
     color+0xff.bc00
     image+'../roshambo/img/roshambo.png'
     base+'roshambo'
-    glob-ames+[~bus 0v0]
+    glob-ames+[~dabbus-fabbus-bacwyl-samweg 0v0]
     version+[0 0 1]
     website+'https://github.com/bacwyls/roshambo'
     license+'MIT'
