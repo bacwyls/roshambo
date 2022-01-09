@@ -255,11 +255,7 @@
       +.action
     ?.  =(src.bowl opponent.ipoi)
       `state
-    :: TODO temporarily setting to earlier time.
-    :: just testing rn, may need to set back
-    ?:  ?&  (lth shoot-time.upoi shoot-time.ipoi)
-            (gth shoot-time.upoi (add now.bowl latency.state))
-        ==
+    ?:  (gth shoot-time.upoi shoot-time.ipoi)
       =/  old-shoot-time=@da  shoot-time.ipoi
       =.  shoot-time.ipoi  shoot-time.upoi
       =.  latency.ipoi  latency.upoi
