@@ -30,7 +30,7 @@ function updateGameState(newGameState) {
   global_shoot_time = shoot_time;
 
   clearInterval(global_timer);
-  if((current_time >= shoot_time) && (current_time < shoot_time+latency)) {
+  if((current_time >= shoot_time - 1000) && (current_time < shoot_time+latency)) {
     // results are in
     var shoot_opponent = newGameState['shoot-opponent']['shot'];
     var shoot_self = newGameState['shoot-self']['shot'];

@@ -196,7 +196,6 @@
   =*  shoot
     ?~  shoot-self.state  !!
     u.shoot-self.state
-
   :*  %pass   /poke-wire   %agent
     [opponent.poise %roshambo]
     %poke  %roshambo-action
@@ -204,7 +203,10 @@
   ==
 ++  is-poise-active
   |=  [=^poise now=@da]
-  ?&  (gte now shoot-time.poise)
+  :: allow one second before shoot-time because
+  :: this was causing inconsistent games..
+  :: what doth time?
+  ?&  (gte now (sub shoot-time.poise ~s1))
     (lte now (add shoot-time.poise latency.poise))
   ==
 ::
@@ -253,7 +255,11 @@
       +.action
     ?.  =(src.bowl opponent.ipoi)
       `state
-    ?:  (gth shoot-time.upoi shoot-time.ipoi)
+    :: TODO temporarily setting to earlier time.
+    :: just testing rn, may need to set back
+    ?:  ?& (lth shoot-time.upoi shoot-time.ipoi)
+           (gth shoot-time.upoi (add now.bowl latency.state))
+        ==
       =/  old-shoot-time=@da  shoot-time.ipoi
       =.  shoot-time.ipoi  shoot-time.upoi
       =.  latency.ipoi  latency.upoi
@@ -317,7 +323,7 @@
     %shoot
       =/  can-shoot=?
         ?~  poise.state  &
-        ?!  (is-poise-active u.poise.state now.bowl)
+        ?!  (is-poise-active u.poise.state (sub now.bowl ~s1))
       ?.  can-shoot
         =/  tmp=@  ?:  verbose.state
           ~&  >>>  "roshambo: you cant set shoot during the game, cheater!"
@@ -330,6 +336,7 @@
       ?.  =(src.bowl our.bowl)  `state
       ?:  =(+>.action our.bowl)  
         :: can't play against yourself, dummy
+        :: note, this would cause an infinite loop.
         `state
       =<
       =/  new-poise=^poise
@@ -340,7 +347,6 @@
           latency.state
         ==
       =.  shoot-opponent.state  ~
-      =.  shoot-self.state  ~
       ?.  requires-rest
         =.  poise.state  [~ new-poise]
         :_  state
