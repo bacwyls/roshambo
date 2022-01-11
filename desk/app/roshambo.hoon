@@ -140,6 +140,12 @@
   ++  make-game
     [poise.state shoot-self.state shoot-opponent.state]
   --
+++  erase-poise-card
+  :*  %pass   /poke-wire   %agent
+    [our.bowl %roshambo]
+    %poke  %roshambo-action
+    !>(`action`[%reset ~])
+  ==
 ++  bwait
   |=  da=@da
   ^-  card
@@ -242,7 +248,7 @@
       ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
       0  0
     :_  state
-    ~[game-update-card]
+    ~[game-update-card erase-poise-card]
   %poise
     :: agents will settle on the later time
     ?~  poise.state
