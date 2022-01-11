@@ -112,7 +112,7 @@
 |_  bowl=bowl:gall
 ++  init-state
   :*  %0
-    ~  ~  ~  ~s10  ~s20  &
+    ~  ~  ~  ~s3  ~s20  &
   ==
 ++  shoot-to-tape
   |=  =shoot
@@ -247,8 +247,10 @@
     :: agents will settle on the later time
     ?~  poise.state
       `state
-    ?:  (gth now.bowl shoot-time.u.poise.state)
-      `state
+    :: TODO can i just remove this & shorten poise-delay?
+    :: testing...
+    :: ?:  (gth now.bowl shoot-time.u.poise.state)
+    ::   `state
     =/  ipoi=^poise
       u.poise.state
     =/  upoi=^poise
