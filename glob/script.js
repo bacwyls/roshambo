@@ -85,17 +85,21 @@ function shoot() {
 
   if(!chosen) return;
 
-  // actually playing the game
-  urb.poke({ app:'roshambo',
-             mark:'roshambo-ui-poise',
-             json: global_opponent });
-  urb.poke({ app:'roshambo',
-             mark:'roshambo-ui-shoot',
-             json: choice[0] });
+  // %poise if not already set
+  var current_time = new Date().getTime();
+  if( global_game_status != 1 ||
+      current_time > global_shoot_time ) {
+    urb.poke({ app:'roshambo',
+               mark:'roshambo-ui-poise',
+               json: global_opponent });
+    urb.poke({ app:'roshambo',
+               mark:'roshambo-ui-shoot',
+               json: choice[0] });
+    setGameStatus(0);
+    setYouPlay(choice);
+    setThemPlay("?");
 
-  setGameStatus(0);
-  setYouPlay(choice);
-  setThemPlay("?");
+  }
 }
 button = document.getElementById('shoot-button'); 
 button.addEventListener('click', shoot);
