@@ -18,10 +18,8 @@ urb.subscribe({
 
 // SSE handler
 // %roshambo sends game state upon:
-//   establishing a game
-//   and getting game results
+// getting game results
 // updates DOM accordingly
-var global_timer;
 var global_shoot_time;
 function updateGameState(newGameState) {
   var shoot_time = newGameState['poise']['shoot-time'];
@@ -29,24 +27,16 @@ function updateGameState(newGameState) {
   var current_time = new Date().getTime();
   global_shoot_time = shoot_time;
 
-  clearInterval(global_timer);
-  if((current_time >= shoot_time - 1000) && (current_time < shoot_time+latency)) {
-    // results are in
-    var shoot_opponent = newGameState['shoot-opponent']['shot'];
-    var shoot_self = newGameState['shoot-self']['shot'];
-    var game_result = computeGameResult(shoot_self, shoot_opponent);
-    setGameStatus(game_result);
+  // results are in
+  var shoot_opponent = newGameState['shoot-opponent']['shot'];
+  var shoot_self = newGameState['shoot-self']['shot'];
+  var game_result = computeGameResult(shoot_self, shoot_opponent);
+  setGameStatus(game_result);
 
-    shoot_opponent = charToShoot(shoot_opponent);
-    shoot_self = charToShoot(shoot_self);
-    setYouPlay(shoot_self);
-    setThemPlay(shoot_opponent);
-  }
-  else if(current_time < shoot_time) {
-    // game is established
-    global_timer = setInterval(setTimer, 100);
-    setGameStatus(1);
-  }
+  shoot_opponent = charToShoot(shoot_opponent);
+  shoot_self = charToShoot(shoot_self);
+  setYouPlay(shoot_self);
+  setThemPlay(shoot_opponent);
 }
 
 
@@ -56,7 +46,6 @@ function updateGameState(newGameState) {
 
 // exit game
 function exit() {
-  clearInterval(global_timer);
   setYouPlay("~");
   setThemPlay("~");
   setGameStatus(0);
@@ -149,24 +138,18 @@ function setGameStatus(game_status) {
     statusmsg.textContent = "...";
     break;
   case 1:
-    // confirmed time
-    statusblock.style.backgroundColor = "yellow";
-    statusblock.style.color = "black";
-    statusmsg.textContent = "game in progress."
-    break;
-  case 2:
     // you win
     statusblock.style.backgroundColor = "green";
     statusblock.style.color = "white";
     statusmsg.textContent = "you win!";
     break;
-  case 3:
+  case 2:
     // you lose
     statusblock.style.backgroundColor = "red";
     statusblock.style.color = "white";
     statusmsg.textContent = "you lose :-(";
     break;
-  case 4:
+  case 3:
     // tie
     statusblock.style.backgroundColor = "gray";
     statusblock.style.color = "white";
@@ -177,31 +160,19 @@ function setGameStatus(game_status) {
 
 // accepts two strings r, p, or s
 // returns a game_status int for setGameStatus
-// 2 : win
-// 3 : lose
-// 4 : tie
+// 1 : win
+// 2 : lose
+// 3 : tie
 function computeGameResult(shoot_self, shoot_opponent) {
   if(shoot_self == shoot_opponent) {
-    return 4;
+    return 3;
   }
   if( ((shoot_self == "r") && (shoot_opponent == "s")) ||
       ((shoot_self == "s") && (shoot_opponent == "p")) ||
       ((shoot_self == "p") && (shoot_opponent == "r")) ){
-    return 2;
+    return 1;
   }
-  return 3;
-}
-
-// countdown timer during game
-function setTimer() {
-  var statusmsg = document.getElementById('status-msg'); 
-  var current_time = new Date().getTime();
-  var diff = global_shoot_time - current_time;
-  statusmsg.textContent = Math.ceil(diff/1000) + " seconds.";
-  if(diff<200){
-    statusmsg.textContent = "time up."; 
-    clearInterval(global_timer);
-  }
+  return 2;
 }
 
 function charToShoot(c) {
