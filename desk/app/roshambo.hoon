@@ -212,6 +212,7 @@
   :: allow one second before shoot-time because
   :: this was causing inconsistent games..
   :: what doth time?
+  :: TODO why..
   ?&  (gte now (sub shoot-time.poise ~s1))
     (lte now (add shoot-time.poise latency.poise))
   ==
@@ -284,7 +285,6 @@
         (brest-proxy old-shoot-time)
         (bwait-proxy shoot-time.ipoi)
         poise-card
-        game-update-card
       ==
     ?:  =(shoot-time.upoi shoot-time.ipoi)
       =/  tmp=@  ?:  verbose.state
@@ -296,8 +296,7 @@
             shoot-time.ipoi
             now.bowl
         0  0
-      :_  state
-        [game-update-card ~]
+      `state
     :: send my poise again
     :: opponent shoot-time < our shoot-time
     :_  state
