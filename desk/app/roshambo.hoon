@@ -112,7 +112,7 @@
 |_  bowl=bowl:gall
 ++  init-state
   :*  %0
-    ~  ~  ~  ~s3  ~s20  &
+    ~  ~  ~  ~s1  ~s3  &
   ==
 ++  shoot-to-tape
   |=  =shoot
@@ -140,7 +140,7 @@
   ++  make-game
     [poise.state shoot-self.state shoot-opponent.state]
   --
-++  erase-poise-card
+++  game-reset-card
   :*  %pass   /poke-wire   %agent
     [our.bowl %roshambo]
     %poke  %roshambo-action
@@ -210,9 +210,8 @@
 ++  is-poise-active
   |=  [=^poise now=@da]
   :: allow one second before shoot-time because
-  :: this was causing inconsistent games..
+  :: this was causing inconsistent games...
   :: what doth time?
-  :: TODO why..
   ?&  (gte now (sub shoot-time.poise ~s1))
     (lte now (add shoot-time.poise latency.poise))
   ==
@@ -249,7 +248,7 @@
       ~&  >>  [u.+.shoot-self.state u.+.shoot-opponent.state]
       0  0
     :_  state
-    ~[game-update-card erase-poise-card]
+    ~[game-update-card game-reset-card]
   %poise
     :: agents will settle on the later time
     ?~  poise.state
